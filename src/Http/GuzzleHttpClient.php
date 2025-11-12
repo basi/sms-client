@@ -1,0 +1,82 @@
+<?php
+
+declare(strict_types=1);
+
+namespace SmsClient\Http;
+
+use RuntimeException;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use SmsClient\Interface\HttpClientInterface;
+
+/**
+ * Guzzleを使用したHTTPクライアント実装
+ */
+class GuzzleHttpClient implements HttpClientInterface
+{
+    private Client $client;
+
+    /**
+     * @param array $config Guzzleクライアントの設定オプション
+     */
+    public function __construct(array $config = [])
+    {
+        $this->client = new Client($config);
+    }
+
+    /**
+     * POSTリクエストを送信する
+     *
+     * @param string $url リクエストURL
+     * @param string $body リクエストボディ
+     * @param array $headers HTTPヘッダー
+     *
+     * @return HttpResponse レスポンス
+     *
+     * @throws RuntimeException HTTPリクエストが失敗した場合
+     */
+    public function post(string $url, string $body, array $headers): HttpResponse
+    {
+        try {
+            $response = $this->client->post($url, [
+                'body' => $body,
+                'headers' => $headers,
+            ]);
+
+            return new HttpResponse(
+                statusCode: $response->getStatusCode(),
+                body: (string) $response->getBody(),
+                headers: $response->getHeaders()
+            );
+        } catch (GuzzleException $e) {
+            throw new RuntimeException("HTTP request failed: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    /**
+     * GETリクエストを送信する
+     *
+     * @param string $url リクエストURL
+     * @param array $headers HTTPヘッダー
+     *
+     * @return HttpResponse レスポンス
+     *
+     * @throws RuntimeException HTTPリクエストが失敗した場合
+     */
+    public function get(string $url, array $headers): HttpResponse
+    {
+        try {
+            $response = $this->client->get($url, [
+                'headers' => $headers,
+            ]);
+
+            return new HttpResponse(
+                statusCode: $response->getStatusCode(),
+                body: (string) $response->getBody(),
+                headers: $response->getHeaders()
+            );
+        } catch (GuzzleException $e) {
+            throw new RuntimeException("HTTP request failed: {$e->getMessage()}", 0, $e);
+        }
+    }
+}
