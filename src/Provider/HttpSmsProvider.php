@@ -67,7 +67,8 @@ class HttpSmsProvider implements SmsProviderInterface
         // レスポンスをパース
         $parsedData = $this->responseParser->parse(
             $httpResponse->body,
-            $httpResponse->statusCode
+            $httpResponse->statusCode,
+            $request
         );
 
         // SendMessageResponseオブジェクトを構築
@@ -111,7 +112,8 @@ class HttpSmsProvider implements SmsProviderInterface
         // レスポンスをパース
         $parsedData = $this->responseParser->parse(
             $httpResponse->body,
-            $httpResponse->statusCode
+            $httpResponse->statusCode,
+            $request
         );
 
         // GetReservationsResponseオブジェクトを構築
@@ -156,7 +158,8 @@ class HttpSmsProvider implements SmsProviderInterface
         // レスポンスをパース
         $parsedData = $this->responseParser->parse(
             $httpResponse->body,
-            $httpResponse->statusCode
+            $httpResponse->statusCode,
+            $request
         );
 
         // CancelResponseオブジェクトを構築

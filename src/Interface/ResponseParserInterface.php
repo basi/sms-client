@@ -14,8 +14,9 @@ interface ResponseParserInterface
      *
      * @param string $rawResponse プロバイダーからの生のレスポンス
      * @param int $statusCode HTTPステータスコード
+     * @param object $request 元のリクエストオブジェクト（型判定に使用）
      *
      * @return array パースされたレスポンスデータ
      */
-    public function parse(string $rawResponse, int $statusCode): array;
+    public function parse(string $rawResponse, int $statusCode, object $request): array;
 }
