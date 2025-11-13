@@ -6,15 +6,17 @@ namespace SmsClient\Request;
 
 /**
  * メッセージキャンセルリクエスト
+ *
+ * PHP 8.2+ readonly classによるイミュータブルなデータ構造
  */
-class CancelRequest
+readonly class CancelRequest
 {
     /**
-     * @param array $messageIds キャンセルするメッセージIDの配列
-     * @param array $additionalParams 追加パラメータ（プロバイダー固有）
+     * @param array<int, string> $messageIds キャンセルするメッセージIDの配列
+     * @param array<string, mixed> $additionalParams 追加パラメータ（プロバイダー固有）
      */
     public function __construct(
-        public readonly array $messageIds,
-        public readonly array $additionalParams = []
+        public array $messageIds,
+        public array $additionalParams = []
     ) {}
 }

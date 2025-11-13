@@ -26,7 +26,7 @@ class SmsClientFactory
      * @param RequestTransformerInterface $requestTransformer リクエスト変換器
      * @param ResponseParserInterface $responseParser レスポンスパーサー
      * @param HttpClientInterface|null $httpClient HTTPクライアント（省略時はGuzzle使用）
-     * @param array $httpClientConfig HTTPクライアントの設定
+     * @param array{timeout?: int, verify?: bool, base_uri?: string, headers?: array<string, string>} $httpClientConfig HTTPクライアントの設定
      *
      * @return Client 構成済みのSMSクライアント
      */

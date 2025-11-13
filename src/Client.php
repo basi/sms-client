@@ -27,7 +27,7 @@ class Client
      * @param string $to 送信先電話番号
      * @param string $message メッセージ本文
      * @param DateTimeInterface|null $scheduledAt 送信予定日時（nullの場合は即時送信）
-     * @param array $additionalParams 追加パラメータ（プロバイダー固有）
+     * @param array<string, mixed> $additionalParams 追加パラメータ（プロバイダー固有）
      *
      * @return SendMessageResponse レスポンス
      */

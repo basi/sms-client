@@ -6,18 +6,20 @@ namespace SmsClient\Http;
 
 /**
  * HTTPレスポンスクラス
+ *
+ * PHP 8.2+ readonly classによるイミュータブルなデータ構造
  */
-class HttpResponse
+readonly class HttpResponse
 {
     /**
      * @param int $statusCode HTTPステータスコード
      * @param string $body レスポンスボディ
-     * @param array $headers レスポンスヘッダー
+     * @param array<string, array<int, string>> $headers レスポンスヘッダー
      */
     public function __construct(
-        public readonly int $statusCode,
-        public readonly string $body,
-        public readonly array $headers = []
+        public int $statusCode,
+        public string $body,
+        public array $headers = []
     ) {}
 
     /**

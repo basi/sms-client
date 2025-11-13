@@ -9,8 +9,10 @@ use SmsClient\Interface\PayloadSerializerInterface;
 
 /**
  * プロバイダー設定クラス
+ *
+ * PHP 8.2+ readonly classによるイミュータブルなデータ構造
  */
-class ProviderConfig
+readonly class ProviderConfig
 {
     /**
      * @param string $baseUrl ベースURL
@@ -19,15 +21,15 @@ class ProviderConfig
      * @param string $cancelEndpoint キャンセルエンドポイント
      * @param PayloadSerializerInterface $serializer ペイロードシリアライザー
      * @param AuthStrategyInterface $authStrategy 認証戦略
-     * @param array $defaultHeaders デフォルトHTTPヘッダー
+     * @param array<string, string> $defaultHeaders デフォルトHTTPヘッダー
      */
     public function __construct(
-        public readonly string $baseUrl,
-        public readonly string $sendEndpoint,
-        public readonly string $getReservationsEndpoint,
-        public readonly string $cancelEndpoint,
-        public readonly PayloadSerializerInterface $serializer,
-        public readonly AuthStrategyInterface $authStrategy,
-        public readonly array $defaultHeaders = []
+        public string $baseUrl,
+        public string $sendEndpoint,
+        public string $getReservationsEndpoint,
+        public string $cancelEndpoint,
+        public PayloadSerializerInterface $serializer,
+        public AuthStrategyInterface $authStrategy,
+        public array $defaultHeaders = []
     ) {}
 }

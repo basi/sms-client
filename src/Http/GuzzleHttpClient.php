@@ -17,7 +17,7 @@ class GuzzleHttpClient implements HttpClientInterface
     private Client $client;
 
     /**
-     * @param array $config Guzzleクライアントの設定オプション
+     * @param array{timeout?: int, verify?: bool, base_uri?: string, headers?: array<string, string>} $config Guzzleクライアントの設定オプション
      */
     public function __construct(array $config = [])
     {

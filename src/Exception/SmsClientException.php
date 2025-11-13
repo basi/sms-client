@@ -9,32 +9,24 @@ use RuntimeException;
 /**
  * SMSクライアントの基底例外クラス
  * すべてのSMS関連エラーに対する統一的なエラーハンドリング
+ *
+ * PHP 8.1+ Backed Enumを使用した型安全なエラーコード管理
  */
 class SmsClientException extends RuntimeException
 {
     /**
-     * エラーコード定義
-     */
-    public const ERROR_NETWORK = 1001;
-    public const ERROR_AUTH = 1002;
-    public const ERROR_VALIDATION = 1003;
-    public const ERROR_PROVIDER = 1004;
-    public const ERROR_TIMEOUT = 1005;
-    public const ERROR_RATE_LIMIT = 1006;
-
-    /**
      * @param string $message エラーメッセージ
-     * @param int $code エラーコード
+     * @param ErrorCode $code エラーコード（Enum）
      * @param \Throwable|null $previous 前の例外
-     * @param array $context 追加のコンテキスト情報
+     * @param array<string, mixed> $context 追加のコンテキスト情報
      */
     public function __construct(
         string $message = "",
-        int $code = 0,
+        ErrorCode $code = ErrorCode::PROVIDER,
         ?\Throwable $previous = null,
-        private array $context = []
+        private readonly array $context = []
     ) {
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, $code->value, $previous);
     }
 
     /**
@@ -52,7 +44,7 @@ class SmsClientException extends RuntimeException
      *
      * @param string $message エラーメッセージ
      * @param \Throwable|null $previous 前の例外
-     * @param array $context 追加のコンテキスト
+     * @param array<string, mixed> $context 追加のコンテキスト
      *
      * @return self
      */
@@ -63,7 +55,7 @@ class SmsClientException extends RuntimeException
     ): self {
         return new self(
             "Network error: $message",
-            self::ERROR_NETWORK,
+            ErrorCode::NETWORK,
             $previous,
             $context
         );
@@ -73,7 +65,7 @@ class SmsClientException extends RuntimeException
      * 認証エラーを生成
      *
      * @param string $message エラーメッセージ
-     * @param array $context 追加のコンテキスト
+     * @param array<string, mixed> $context 追加のコンテキスト
      *
      * @return self
      */
@@ -83,7 +75,7 @@ class SmsClientException extends RuntimeException
     ): self {
         return new self(
             "Authentication failed: $message",
-            self::ERROR_AUTH,
+            ErrorCode::AUTH,
             null,
             $context
         );
@@ -93,7 +85,7 @@ class SmsClientException extends RuntimeException
      * バリデーションエラーを生成
      *
      * @param string $message エラーメッセージ
-     * @param array $context 追加のコンテキスト
+     * @param array<string, mixed> $context 追加のコンテキスト
      *
      * @return self
      */
@@ -103,7 +95,7 @@ class SmsClientException extends RuntimeException
     ): self {
         return new self(
             "Validation error: $message",
-            self::ERROR_VALIDATION,
+            ErrorCode::VALIDATION,
             null,
             $context
         );
@@ -125,7 +117,7 @@ class SmsClientException extends RuntimeException
     ): self {
         return new self(
             "Provider error: $message",
-            self::ERROR_PROVIDER,
+            ErrorCode::PROVIDER,
             null,
             [
                 'statusCode' => $statusCode,
@@ -148,7 +140,7 @@ class SmsClientException extends RuntimeException
     ): self {
         return new self(
             "Operation '$operation' timed out after {$timeout} seconds",
-            self::ERROR_TIMEOUT,
+            ErrorCode::TIMEOUT,
             null,
             [
                 'operation' => $operation,
@@ -166,13 +158,13 @@ class SmsClientException extends RuntimeException
      */
     public static function rateLimitError(int $retryAfter = 0): self
     {
-        $message = $retryAfter > 0 
+        $message = $retryAfter > 0
             ? "Rate limit exceeded. Retry after {$retryAfter} seconds"
             : "Rate limit exceeded";
 
         return new self(
             $message,
-            self::ERROR_RATE_LIMIT,
+            ErrorCode::RATE_LIMIT,
             null,
             ['retryAfter' => $retryAfter]
         );

@@ -42,7 +42,7 @@ class HttpSmsProvider implements SmsProviderInterface
      *
      * @param object $request リクエストオブジェクト
      *
-     * @return array 認証情報が適用されたペイロード
+     * @return array<string, mixed> 認証情報が適用されたペイロード
      */
     private function preparePayload(object $request): array
     {
@@ -58,16 +58,16 @@ class HttpSmsProvider implements SmsProviderInterface
      *
      * @param string|null $contentType Content-Type（POSTリクエスト時）
      *
-     * @return array 認証情報が適用されたヘッダー
+     * @return array<string, string> 認証情報が適用されたヘッダー
      */
     private function prepareHeaders(?string $contentType = null): array
     {
         $headers = $this->config->defaultHeaders;
-        
+
         if ($contentType !== null) {
             $headers['Content-Type'] = $contentType;
         }
-        
+
         return $this->config->authStrategy->applyToHeaders($headers);
     }
 
@@ -100,7 +100,7 @@ class HttpSmsProvider implements SmsProviderInterface
      * @param object $request 元のリクエスト
      * @param string $operation 操作名
      *
-     * @return array パースされたデータ
+     * @return array<string, mixed> パースされたデータ
      */
     private function parseResponse(HttpResponse $httpResponse, object $request, string $operation): array
     {
@@ -244,7 +244,7 @@ class HttpSmsProvider implements SmsProviderInterface
      * GETリクエスト用のURLを構築
      *
      * @param string $endpoint エンドポイント
-     * @param array $params クエリパラメータ
+     * @param array<string, mixed> $params クエリパラメータ
      *
      * @return string 完全なURL
      */
@@ -252,11 +252,11 @@ class HttpSmsProvider implements SmsProviderInterface
     {
         $url = $this->config->baseUrl . $endpoint;
         $queryString = http_build_query($params);
-        
+
         if ($queryString !== '') {
             $url .= '?' . $queryString;
         }
-        
+
         return $url;
     }
 }
