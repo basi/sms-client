@@ -168,8 +168,9 @@ class HttpSmsProvider implements SmsProviderInterface
     public function getReservations(GetReservationsRequest $request): GetReservationsResponse
     {
         try {
-            // ペイロードとURLを準備
-            $payload = $this->preparePayload($request);
+            // GETリクエストでは認証情報をペイロード（URLパラメータ）に含めない
+            // AuthStrategyの認証情報はヘッダーで送信
+            $payload = $this->requestTransformer->transform($request);
             $url = $this->buildGetUrl($this->config->getReservationsEndpoint, $payload);
             $headers = $this->prepareHeaders();
 
@@ -209,8 +210,9 @@ class HttpSmsProvider implements SmsProviderInterface
     public function cancelReservations(CancelRequest $request): CancelResponse
     {
         try {
-            // ペイロードとURLを準備
-            $payload = $this->preparePayload($request);
+            // GETリクエストでは認証情報をペイロード（URLパラメータ）に含めない
+            // AuthStrategyの認証情報はヘッダーで送信
+            $payload = $this->requestTransformer->transform($request);
             $url = $this->buildGetUrl($this->config->cancelEndpoint, $payload);
             $headers = $this->prepareHeaders();
 
