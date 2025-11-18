@@ -21,6 +21,10 @@ class GuzzleHttpClient implements HttpClientInterface
      */
     public function __construct(array $config = [])
     {
+        // HTTPS通信の強制：SSL/TLS証明書の検証を必須に
+        // セキュリティのため、verify => true を強制
+        $config['verify'] = true;
+
         $this->client = new Client($config);
     }
 

@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace SmsClient;
 
-use DateTimeInterface;
+use SmsClient\Request\CancelRequest;
+use SmsClient\Response\CancelResponse;
 use SmsClient\Request\SendMessageRequest;
 use SmsClient\Response\SendMessageResponse;
+use SmsClient\Request\GetReservationsRequest;
 use SmsClient\Interface\SmsProviderInterface;
+use SmsClient\Response\GetReservationsResponse;
 
 /**
  * SMSクライアントのメインクラス
@@ -24,26 +27,36 @@ class Client
     /**
      * SMSメッセージを送信（または予約）する
      *
-     * @param string $to 送信先電話番号
-     * @param string $message メッセージ本文
-     * @param DateTimeInterface|null $scheduledAt 送信予定日時（nullの場合は即時送信）
-     * @param array<string, mixed> $additionalParams 追加パラメータ（プロバイダー固有）
+     * @param SendMessageRequest $request 送信リクエスト
      *
      * @return SendMessageResponse レスポンス
      */
-    public function sendMessage(
-        string $to,
-        string $message,
-        ?DateTimeInterface $scheduledAt = null,
-        array $additionalParams = []
-    ): SendMessageResponse {
-        $request = new SendMessageRequest(
-            to: $to,
-            message: $message,
-            scheduledAt: $scheduledAt,
-            additionalParams: $additionalParams
-        );
-
+    public function sendMessage(SendMessageRequest $request): SendMessageResponse
+    {
         return $this->provider->sendMessage($request);
+    }
+
+    /**
+     * 予約されたSMSメッセージを取得する
+     *
+     * @param GetReservationsRequest $request 予約取得リクエスト
+     *
+     * @return GetReservationsResponse レスポンス
+     */
+    public function getReservations(GetReservationsRequest $request): GetReservationsResponse
+    {
+        return $this->provider->getReservations($request);
+    }
+
+    /**
+     * 予約されたSMSメッセージをキャンセルする
+     *
+     * @param CancelRequest $request キャンセルリクエスト
+     *
+     * @return CancelResponse レスポンス
+     */
+    public function cancelReservations(CancelRequest $request): CancelResponse
+    {
+        return $this->provider->cancelReservations($request);
     }
 }
