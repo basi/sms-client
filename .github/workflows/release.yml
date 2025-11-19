@@ -1,0 +1,119 @@
+name: Auto Release from composer.json
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'composer.json'
+
+permissions:
+  contents: write
+
+jobs:
+  check-and-release:
+    name: Check Version and Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from composer.json
+        id: extract_version
+        run: |
+          VERSION=$(jq -r '.version // empty' composer.json)
+
+          if [ -z "$VERSION" ]; then
+            echo "No version field found in composer.json"
+            exit 0
+          fi
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          echo "Detected version: $VERSION"
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+
+          if [ -z "$VERSION" ]; then
+            echo "exists=skip" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          TAG="v$VERSION"
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag $TAG already exists, skipping release"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag $TAG does not exist, will create release"
+          fi
+
+      - name: Validate version format
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "Error: Invalid version format '$VERSION'. Expected: X.Y.Z or X.Y.Z-prerelease"
+            exit 1
+          fi
+          echo "Version format is valid: $VERSION"
+
+      - name: Create and push tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          TAG="${{ steps.extract_version.outputs.tag }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+          echo "Created and pushed tag: $TAG"
+
+      - name: Generate release notes
+        if: steps.check_tag.outputs.exists == 'false'
+        id: release_notes
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "First release"
+            NOTES="## Release v$VERSION"$'\n\n'"Initial release of sms-client"
+          else
+            echo "Previous tag: $PREVIOUS_TAG"
+            NOTES="## Release v$VERSION"$'\n\n'"### Changes since $PREVIOUS_TAG"$'\n\n'
+            CHANGES=$(git log $PREVIOUS_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges)
+            NOTES="$NOTES$CHANGES"
+          fi
+
+          {
+            echo 'notes<<EOF'
+            echo "$NOTES"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        if: steps.check_tag.outputs.exists == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.extract_version.outputs.tag }}"
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          NOTES="${{ steps.release_notes.outputs.notes }}"
+
+          gh release create "$TAG" \
+            --title "v$VERSION" \
+            --notes "$NOTES"
+
+          echo "Created GitHub release: $TAG"
+
+      - name: Release skipped
+        if: steps.check_tag.outputs.exists == 'true'
+        run: |
+          echo "Release skipped - tag already exists for version ${{ steps.extract_version.outputs.version }}"

@@ -1,5 +1,6 @@
 {
     "name": "basi/sms-client",
+    "version": "0.1.0",
     "type": "library",
     "autoload": {
         "psr-4": {
