@@ -1,6 +1,8 @@
 {
     "name": "basi/sms-client",
     "type": "library",
+    "description": "A PHP client for SMS services",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "SmsClient\\": "src/"
