@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT }}
       
       - name: Setup Node.js
         uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
@@ -30,7 +30,7 @@ jobs:
       - name: Check Existing Version Bump PR
         id: check_pr
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           # バージョンインクリメントPRの検索
           PR_COUNT=$(gh pr list --state open --search "chore: バージョンを自動インクリメント in:title" --json number | jq length)
@@ -50,7 +50,7 @@ jobs:
         if: steps.check_pr.outputs.pr_exists == '0'
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT }}
           commit-message: "chore: bump version"
           title: "chore: バージョンを自動インクリメント"
           body: |
