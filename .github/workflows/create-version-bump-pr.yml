@@ -40,15 +40,6 @@ jobs:
             exit 0
           fi
       
-      - name: Create Version Bump Branch
-        if: steps.check_pr.outputs.pr_exists == '0'
-        run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          BRANCH_NAME="chore/bump-version-$(date +%s)"
-          git checkout -b $BRANCH_NAME
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-      
       - name: Update Version
         if: steps.check_pr.outputs.pr_exists == '0'
         id: version
@@ -57,15 +48,13 @@ jobs:
       
       - name: Create Pull Request
         if: steps.check_pr.outputs.pr_exists == '0'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git add src/Client.php
-          git commit -m "chore: bump version"
-          git push origin $BRANCH_NAME
-          gh pr create \
-            --title "chore: バージョンを自動インクリメント" \
-            --body "## 概要
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: bump version"
+          title: "chore: バージョンを自動インクリメント"
+          body: |
+            ## 概要
             
             mainブランチへのマージを検知し、バージョンを自動的にインクリメントします。
             
@@ -73,6 +62,8 @@ jobs:
             - src/Client.phpのバージョンをインクリメント
             
             ## 自動生成について
-            このPRは自動的に生成されています。マージ後、GitHub Actionsによってリリースが作成されます。" \
-            --base main \
-            --head $BRANCH_NAME
+            このPRは自動的に生成されています。マージ後、GitHub Actionsによってリリースが作成されます。
+          branch: chore/bump-version-${{ github.run_id }}-${{ github.run_number }}
+          base: main
+          add-paths: |
+            src/Client.php
