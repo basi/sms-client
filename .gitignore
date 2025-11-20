@@ -6,6 +6,12 @@ composer.lock
 .phpunit.result.cache
 /phpunit.xml
 
+# Environment
+.env
+
+# PHPUnit Cache
+.phpunit.cache
+
 # IDE
 .idea/
 .vscode/
