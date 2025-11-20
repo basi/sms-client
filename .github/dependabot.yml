@@ -4,27 +4,29 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
-  - package-ecosystem: 'composer'
-    directory: '/'
+updates:
+  - package-ecosystem: "composer"
+    directory: "/"
     schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '17:00'
-      timezone: 'Asia/Tokyo'
-    target-branch: 'main'
+      interval: "weekly"
+      day: "monday"
+      time: "17:00"
+      timezone: "Asia/Tokyo"
+    target-branch: "main"
     assignees:
-      - 'HaiTo'
+      - "HaiTo"
     cooldown:
       default-days: 7
-  - package-ecosystem: 'github-actions'
-    directory: '/'
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '17:00'
-      timezone: 'Asia/Tokyo'
-    target-branch: 'main'
+      interval: "weekly"
+      day: "monday"
+      time: "17:00"
+      timezone: "Asia/Tokyo"
+    target-branch: "main"
     assignees:
-      - 'HaiTo'
+      - "HaiTo"
     cooldown:
       default-days: 7
