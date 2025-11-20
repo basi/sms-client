@@ -21,7 +21,8 @@ jobs:
         php-version: '8.4'
 
     - name: Validate composer.json and composer.lock
-      run: composer validate --strict
+      # Allow composer.json to contain the version field
+      run: composer validate --strict --no-check-version
 
     - name: Cache Composer packages
       id: composer-cache
