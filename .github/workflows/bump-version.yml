@@ -1,0 +1,58 @@
+name: Create Release
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  create-release:
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.title, 'chore: バージョンを自動インクリメント')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Get Version from Client.php
+        id: version
+        run: |
+          VERSION=$(node -e "
+            const fs = require('fs');
+            const content = fs.readFileSync('src/Client.php', 'utf8');
+            const match = content.match(/public const VERSION = '([0-9]+\.[0-9]+\.[0-9]+)';/);
+            if (match) console.log(match[1]);
+          ")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+      
+      - name: Create Archive
+        run: |
+          zip -r sms-client.zip . -x "*.git*" "tests/*" ".github/*"
+      
+      - name: Create Tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GH_PAT }}
+          custom_tag: ${{ steps.version.outputs.version }}
+          tag_prefix: v
+      
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+          artifacts: "sms-client.zip"
+          token: ${{ secrets.GH_PAT }}
