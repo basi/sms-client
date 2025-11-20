@@ -14,15 +14,15 @@ jobs:
     if: github.event.pull_request.merged == true && contains(github.event.pull_request.title, 'chore: バージョンを自動インクリメント')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
         with:
-          node-version: '18'
+          node-version: '24'
       
       - name: Get Version from Client.php
         id: version
