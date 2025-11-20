@@ -20,7 +20,7 @@ class Client
     /**
      * クライアントのバージョン
      */
-    public const VERSION = '0.0.1';
+    public const VERSION = '0.0.2';
 
     /**
      * @param SmsProviderInterface $provider SMSプロバイダー実装
