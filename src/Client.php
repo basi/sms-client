@@ -18,6 +18,11 @@ use SmsClient\Response\GetReservationsResponse;
 class Client
 {
     /**
+     * クライアントのバージョン
+     */
+    public const VERSION = '0.0.1';
+
+    /**
      * @param SmsProviderInterface $provider SMSプロバイダー実装
      */
     public function __construct(
